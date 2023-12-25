@@ -214,9 +214,6 @@ def fetch_ipo():
     
     for index, row in df.iterrows():
         url_contents = fetch_url_contents(row['IPO Link'])
-        with open("test_ipo_new_sample.html",'w+') as f:
-            f.write(url_contents)
-            f.close()
         ipo_name = " ".join(str(row['Issuer Company']).split(" ")[0:-2])
         topic_id = str(row['IPO Link']).split('/')[-2]
         additional_details = get_ipo_details(url_contents, row['Close Date'], ipo_name, topic_id)
@@ -233,11 +230,6 @@ def fetch_ipo():
     html = format_to_html(df)
     
     result = send_mail(html)
-    
-    #print(df.to_string())
-
-    with open('final.html', 'w') as f:
-        f.write(html)
 
 if __name__ == "__main__":
     fetch_ipo()
