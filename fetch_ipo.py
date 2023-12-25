@@ -1,4 +1,6 @@
+import os
 import re
+import sys
 import pandas 
 import numpy as np
 import smtplib
@@ -17,6 +19,8 @@ import chittorgarh_configs as CC
 extra_headers = ['P/E Multiples','Buy or Not','Description','GMP (Rs)','Subscription(times) - Retail','SPTulsian Review','Apply Date', 'GMP Link', 'SPT Link']
 headers_not_required = ['Issue Size (Rs Cr.)','Lot Size','Exchange']
 
+def notify(title, text):
+    os.system("""osascript -e 'display notification "{}" with title "{}"'""".format(text, title))
 
 def fetch_url_contents(url = CC.MAINBOARD_URL):
     req = requests.get(url)
@@ -69,7 +73,6 @@ def get_ipo_details(url_contents, close_date, ipo_name, topic_id):
     result['P/E Multiples'] = re.findall('>.*?<', pe_multiples_string)[-1][1:-1]
 
     description_string = re.findall('<h2 class="border-bottom">About.*?</div>', url_contents)[0]
-    print(description_string)
     for desc in description_string.split('<p>')[1:3]:
         result['Description'] += str(desc).replace('</p>','')
 
@@ -106,7 +109,6 @@ def get_ipo_details(url_contents, close_date, ipo_name, topic_id):
 
     result['SPT Link'], result['SPTulsian Review'] = get_sptulsian_review(ipo_name)
     
-    #print(result)
     return result  
 
 def get_apply_date(close_date):
@@ -122,7 +124,6 @@ def get_apply_date(close_date):
 
 def get_sptulsian_review(ipo_name):
     try:
-        print(ipo_name)
         contents = fetch_url_contents('https://www.sptulsian.com/f/ipo-analysis/')
         contents = contents.replace('\n','').lower()
 
@@ -226,18 +227,25 @@ def fetch_ipo():
                                                 {additional_details["Buy or Not"]["Members"]["Avoid"]}'
     
     df = df.rename(columns={"Buy or Not" : "Buy or Not (Subscribe, Neutral, Avoid)"})
-    print(df)
+    print(df.to_string())
     html = format_to_html(df)
     
     result = send_mail(html)
+    notify("IPO Dashboard Email", "Success")
 
 if __name__ == "__main__":
-    fetch_ipo()
-    """url = "https://www.chittorgarh.com/ipo/azad-engineering-ipo/1597/"
-    contents = fetch_url_contents(url)
-    with open('old_test_ipo.html','w+') as f:
-        f.write(contents)
-        f.close"""
+    try:
+        fetch_ipo()
+        """url = "https://www.chittorgarh.com/ipo/azad-engineering-ipo/1597/"
+        contents = fetch_url_contents(url)
+        with open('old_test_ipo.html','w+') as f:
+            f.write(contents)
+            f.close"""
+        sys.exit(0)
+    except Exception as e:
+        print(traceback.format_exc())
+        notify("IPO Dashboard Email", "Failed")
+        sys.exit(1)
 
     
 
