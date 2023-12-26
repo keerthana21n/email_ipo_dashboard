@@ -179,7 +179,7 @@ def format_to_html(dataframe : pandas.DataFrame):
 
 def send_mail(html):
     sender = "knofficial21@gmail.com"
-    recievers = ["knofficial21@gmail.com"] #["vaibhavn056@gmail.com", "knofficial21@gmail.com", "ningaraju2000@gmail.com"]
+    recievers = ["vaibhavn056@gmail.com", "knofficial21@gmail.com", "ningaraju2000@gmail.com"]
     s = smtplib.SMTP('smtp.gmail.com', 587)
     s.starttls()
     s.login(sender, "xgtk aluf ldss qodd")
