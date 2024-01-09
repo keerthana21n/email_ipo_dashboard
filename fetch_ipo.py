@@ -127,13 +127,30 @@ def get_sptulsian_review(ipo_name):
         contents = fetch_url_contents('https://www.sptulsian.com/f/ipo-analysis/')
         contents = contents.replace('\n','').lower()
 
-        link = f"https://www.sptulsian.com/f/ipo-analysis/{str(ipo_name).lower().replace(' ','-')}"
+        ipo_name_list = str(ipo_name).split(" ")
 
-        tagline_string = re.findall(f'<a class="article_content_url" href="{link}">.*?<br/>', contents)[0]
-        tagline = re.findall("<div>.*?<br/>", tagline_string)[0][5:-5]
+        tagline_string = ''
+        tagline = ''
+
+        for i in range(0, len(ipo_name_list)):
+            name = str(" ".join(ipo_name_list[0:len(ipo_name_list)-i])).lower().replace(' ','-')
+            link = f"https://www.sptulsian.com/f/ipo-analysis/{name}"
+            print(
+                
+            )
+
+            try:
+                tagline_string = re.findall(f'<a class="article_content_url" href="{link}">.*?<br/>', contents)[0]
+                tagline = re.findall("<div>.*?<br/>", tagline_string)[0][5:-5]
+                
+                return link, str(tagline).title().strip()
+            except Exception :
+                print(f"Failed sp tulsian link : {name}")
+                continue
+        
         return link, str(tagline).title().strip()
 
-    except Exception as e:
+    except Exception :
         print(traceback.format_exc())
         return "No Link Found", "No Review Found"
 
